@@ -305,7 +305,6 @@
             `;
         }
 
-        // 동점자 선택 후 로딩을 거쳐 결과를 보여주는 함수
         window.showTieBreakerResult = (pid) => {
             showLoading("당신을 위한 최종 교육 지침을 정리 중입니다");
             setTimeout(() => {
@@ -355,6 +354,7 @@
                             <div class="space-y-4">
                                 ${p.theory.map((th, i) => `
                                     <div class="bg-white border border-gray-100 shadow-sm p-4 rounded-xl">
+                                        <p class="text-sm font-bold text-blue-600 mb-1">${th.split(':')[0]}</p>
                                         <p class="text-sm text-gray-600">${th.split(':')[1] || ''}</p>
                                     </div>
                                 `).join('')}
