@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내 안에 숨어있는 교육철학자는 누구?</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8fafc; }
+        .card-choice.selected-1 { border: 2px solid #3b82f6; background-color: #eff6ff; }
+        .card-choice.selected-2 { border: 2px solid #10b981; background-color: #ecfdf5; }
+        .card-choice.selected-3 { border: 2px solid #f59e0b; background-color: #fffbeb; }
+        .badge { position: absolute; top: -10px; right: -10px; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: white; }
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* 로딩 애니메이션 */
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #EBF5FF;
+            border-bottom-color: #3b82f6;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="min-h-screen p-4 flex flex-col items-center justify-center">
+
+    <div id="app" class="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden min-h-[600px] flex flex-col relative">
+        <!-- 상단 헤더 -->
+        <div id="header" class="hidden px-6 pt-6 flex justify-between items-center">
+            <div class="flex gap-3">
+                <button onclick="showStart()" class="text-gray-400 hover:text-gray-600 flex items-center text-xs">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    다시 시작
+                </button>
+                <button id="prev-btn" onclick="prevStep()" class="hidden text-gray-400 hover:text-gray-600 flex items-center text-xs border-l pl-3 border-gray-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                    이전으로
+                </button>
+            </div>
+            <div id="step-indicator" class="text-xs font-bold text-gray-400"></div>
+        </div>
+
+        <!-- 메인 컨텐츠 영역 -->
+        <div id="content" class="p-6 flex-grow flex flex-col">
+            <!-- 화면들이 이곳에 동적으로 로드됩니다 -->
+        </div>
+    </div>
+
+    <script>
+        // --- 데이터 정의 ---
+        const philosophers = {
+            socrates: { name: "소크라테스", title: "생각을 흔드는 질문러,<br>'소크라테스'", intro: "잠깐, 그거 진짜 네 생각이야?<br>아니면 남들이 그렇다니까 믿는 거야?", summary: "정답을 외우기보다 진짜 이유를<br>끝까지 파고드는 탐구형 인간", traits: ["“왜?”라는 질문을 그냥 넘기지 못함", "친구의 고민상담에 답을 주기보다 질문을 던지는 타입", "선생님 설명을 들어도 늘 의문을 가짐", "토론 수업에서 에너지가 올라감"], theory: ["모르는 걸 아는 것이 공부의 시작: 진짜 공부는 질문하는 것에서 시작한다.", "선생님은 지식 전달자가 아니라 생각의 산파: 선생님은 학생의 머릿속에 있는 생각을 꺼내도록 돕는 사람", "진짜로 알면 행동도 바뀐다: 진정한 앎은 도덕적 인간을 만듦."], message: "누가 정해준 답대로 살지 마.<br>네 안에는 이미 엄청난 답들이 잠들어 있어!", icon: "🧐" },
+            plato: { name: "플라톤", title: "잠재력을 깨우는 미래의 리더,<br>'플라톤'", intro: "내 안의 다이아몬드를 찾아라!<br>넌 세상을 더 좋게 바꿀 특별한 역할을 타고났어.", summary: "자신의 재능을 키워<br>세상을 더 좋은 방향으로 이끄는 리더형", traits: ["체계적인 커리큘럼이 있는 공부 선호", "개인의 적성에 맞는 개별화 교육 선호", "공부를 통해 영향력 있는 리더를 꿈꿈", "본질적인 가치와 지식을 중시함"], theory: ["교육은 진리를 보게 하는 것: 교육은 이데아를 보게 만드는 과정", "사람마다 다른 재능을 가지고 태어남: 개인의 능력과 적성에 맞는 개별화 교육 필요", "선생님은 길을 먼저 본 안내자: 교사는 학생을 올바른 방향으로 이끌어야 함"], message: "네 안에는 아직 발견되지 않은 능력이 있어.<br>그 잠재력을 키워 세상을 더 밝게 만들어봐!", icon: "🏛" },
+            aristotle: { name: "아리스토텔레스", title: "꾸준함으로 성장하는 현실 멘토,<br>'아리스토텔레스'", intro: "성공은 한 번의 행동이 아니라<br>반복된 습관이다.", summary: "작은 습관을 쌓아 균형 잡힌<br>행복한 삶을 만드는 실천가", traits: ["말보다 행동이 중요함", "생활 루틴처럼 공부", "균형과 중용을 추구", "공부와 삶의 행복을 함께 챙김"], theory: ["지식보다 실천이 중요: 교육은 행복한 삶을 살아가는 능력을 키우는 과정", "좋은 습관이 인생을 만든다: 좋은 행동을 반복하면 그것이 성격이 된다", "중용의 미덕: 어느 곳에도 치우치지 않는 균형 잡힌 삶이 중요"], message: "오늘 당장 엄청난 걸 이루지 않아도 괜찮아.<br>대신 오늘의 작은 습관 하나가 내일의 멋진 너를 만들거야.", icon: "🏃" },
+            rousseau: { name: "루소", title: "나답게 성장하는 자유로운 탐구자,<br>'루소'", intro: "내 안의 선함을 지키며<br>본연의 나를 찾아가라.", summary: "정해진 틀보다 자연스럽게 성장하는<br>자유로운 인간", traits: ["자율적인 환경 선호", "강압적인 규칙 거부", "글보다 직접 경험하는 배움 중시", "감정과 본성을 중요하게 생각함"], theory: ["어린이는 작은 어른이 아니다: 아이의 본성을 지키며 나답게 성장하는 것이 중요", "소극적 교육: 교사는 모든 것을 가르치기보다 성장을 지켜봐 주기", "자연과 경험이 최고의 교과서: 책보다 경험을 통한 배움을 추구"], message: "세상이 정한 기준에 너를 억지로 맞추지마.<br>네가 가장 너다울 때, 진짜 성장이 시작될 거야!", icon: "🌿" },
+            dewey: { name: "듀이", title: "경험으로 배우는 프로젝트 마스터,<br>'듀이'", intro: "교육은 현재를 살아가는<br>삶 속에서 이뤄진다!", summary: "교과서 밖의 진짜 세상을 탐구하고<br>협력하며 배우는 실천가", traits: ["결과물을 만드는 활동 선호", "협력 활동에서 에너지 상승", "실용적인 성격", "과정을 통한 배움 중시"], theory: ["Learning by Doing: 직접 내 손으로 해보는 것이 가장 좋은 공부", "경험의 재구성: 어제의 경험이 오늘의 배움이 되고 내일의 성장으로 이어짐", "학교는 작은 사회: 함께 살아가는 법을 배우는 협력 학습의 장"], message: "경험하고, 질문하고, 다시 도전해봐.<br>그 과정이 바로 배움이 될 거야.", icon: "🛠" },
+            freire: { name: "프레이리", title: "세상을 바꾸는 행동하는 혁명가,<br>'프레이리'", intro: "교육은 세상을 바꾸는 힘이다.", summary: "세상을 해석하고<br>변화를 꿈꾸는 정의로운 탐구자", traits: ["불공평한 상황을 못 참음", "사회 문제에 관심이 많음", "일방적인 강의를 답답해함", "수평적인 토론과 대화 선호"], theory: ["은행 저금식 교육 비판: 교사의 일방적인 지식 주입이 아닌 학생의 주체성 강조", "문제 제기식 교육: 현실의 모순을 깨닫고 변화를 위해 고민하는 과정이 중요", "수평적 대화: 교사와 학생은 함께 성장하는 대화 파트너"], message: "세상이 정해놓은 규칙에 무조건 순응하지 마.<br>'왜 이럴까?'라고 묻는 순간부터 너는 세상을 바꿀 힘을 갖게 된단다.", icon: "🔥" },
+            sartre: { name: "사르트르", title: "내 인생의 자유로운 선택자,<br>'사르트르'", intro: "내 삶은 내가 선택하고 책임진다.", summary: "정해진 길이 아니라 스스로 선택하며<br>살아가는 주체적인 인간", traits: ["정해진 운명을 믿지 않음", "스스로의 선택을 중시", "자유와 책임을 동시 수용", "자신의 삶을 스스로 창조함"], theory: ["실존은 본질에 앞선다: 나는 어떤 사람이 될 것인지는 스스로 창조해나감", "선택이 곧 나 자신: 정해진 답이 아닌 스스로 고민하고 결정하는 것이 중요", "자유와 책임: 자유로운 만큼 그 선택의 책임도 스스로 져야함"], message: "미래가 불안한 건 당연해. 정해진 길이 없으니까! 하지만<br>그건 네가 무엇이든 될 수 있다는 뜻이기도 하단다.", icon: "🎭" }
+        };
+
+        const questions = [
+            {
+                q: "왜 교육이 필요할까?",
+                options: [
+                    { pid: 'socrates', text: "스스로 끊임없이 질문을 던져 진짜 나를 발견하고 깨달음을 얻기 위해." },
+                    { pid: 'plato', text: "나의 뛰어난 역량을 최대한 길러서 세상을 올바르게 이끄는 리더가 되기 위해." },
+                    { pid: 'aristotle', text: "실력을 쌓고 좋은 습관을 들여서 균형 잡힌 행복한 삶을 살아가기 위해." },
+                    { pid: 'rousseau', text: "누군가 강요하는 모습이 아니라 내가 타고난 성격과 재능을 그대로 꽃피우기 위해." },
+                    { pid: 'dewey', text: "일상의 다양한 경험 속에서 계속 배우며 어제보다 더 나은 내가 되기 위해." },
+                    { pid: 'freire', text: "세상의 불평등함을 발견하고 우리 사회를 더 좋게 바꿀 힘을 기르기 위해." },
+                    { pid: 'sartre', text: "남이 정해준 길이 아니라 내 삶의 의미를 스스로 결정하고 책임지기 위해." }
+                ]
+            },
+            {
+                q: "교육을 통해 무엇을 배워야 할까?",
+                options: [
+                    { pid: 'socrates', text: "교과서에 담긴 정답보다는 본질을 깊이 파고드는 질문과 대화." },
+                    { pid: 'plato', text: "시대를 초월해 변하지 않는 가치를 담은 인문학 고전과 깊이 있는 지식." },
+                    { pid: 'aristotle', text: "세상을 체계적으로 이해하는 데 꼭 필요한 기초 학문과 논리적 사고력." },
+                    { pid: 'rousseau', text: "글로만 배우는 지식보다 내 몸과 마음으로 직접 느끼는 자연스러운 경험." },
+                    { pid: 'dewey', text: "지금 당장 내 삶에서 겪고 있는 생생한 고민과 그것을 해결하는 방법." },
+                    { pid: 'freire', text: "사회의 어두운 면이나 부조리한 현실을 비판적으로 바라보는 내용들." },
+                    { pid: 'sartre', text: "정해진 교과서 내용보다 현재 나의 고민과 실존적인 선택에 관한 문제들." }
+                ]
+            },
+            {
+                q: "어떻게 교육해야 할까?",
+                options: [
+                    { pid: 'socrates', text: "선생님이 정답을 알려주기보다 계속 질문을 던져 내 생각을 자극하는 방식." },
+                    { pid: 'plato', text: "개인의 능력과 수준에 맞춰 가장 효율적으로 공부할 수 있는 코스를 제공받는 방식." },
+                    { pid: 'aristotle', text: "원리를 정확히 이해한 뒤, 내 것이 될 때까지 꾸준히 반복해서 훈련하는 방식." },
+                    { pid: 'rousseau', text: "선생님이 일일이 간섭하지 않고, 내가 자연스럽게 스스로 배우도록 유도하는 방식." },
+                    { pid: 'dewey', text: "친구들과 협력하여 프로젝트를 수행하며 몸소 부딪쳐서 배우는 방식." },
+                    { pid: 'freire', text: "선생님과 학생이 수평적인 위치에서 사회 문제를 놓고 함께 토론하는 방식." },
+                    { pid: 'sartre', text: "어떤 틀에도 가두지 않고 내가 원하는 공부를 자유롭게 선택해서 하는 방식." }
+                ]
+            },
+            {
+                q: "선생님은 학생에게 어떤 존재일까?",
+                options: [
+                    { pid: 'socrates', text: "정답을 향해 함께 길을 찾아 나가는 다정한 '대화 파트너'." },
+                    { pid: 'plato', text: "나의 잠재력을 알아보고 나를 올바른 길로 이끌어주는 '든든한 지도자'." },
+                    { pid: 'aristotle', text: "삶의 지혜를 먼저 터득하여 나의 올바른 습관 형성을 돕는 '인생 멘토'." },
+                    { pid: 'rousseau', text: "내가 방해받지 않고 건강하게 자랄 수 있도록 곁을 지켜주는 '조력자'." },
+                    { pid: 'dewey', text: "우리가 즐겁게 배우고 성장할 수 있도록 학습 환경을 설계해 주는 '기획자'." },
+                    { pid: 'freire', text: "서로의 생각을 자유롭게 나누며 함께 세상을 배워가는 '민주적인 동료'." },
+                    { pid: 'sartre', text: "내가 내 삶의 주인으로서 스스로 결정할 수 있게 일깨워주는 '조언자'." }
+                ]
+            }
+        ];
+
+        // --- 상태 관리 ---
+        let currentStep = 0;
+        let scores = { socrates: 0, plato: 0, aristotle: 0, rousseau: 0, dewey: 0, freire: 0, sartre: 0 };
+        let history = []; 
+        let currentOptions = []; 
+        let currentSelection = { rank1: null, rank2: null, rank3: null };
+
+        const contentEl = document.getElementById('content');
+        const headerEl = document.getElementById('header');
+        const prevBtnEl = document.getElementById('prev-btn');
+        const stepIndicatorEl = document.getElementById('step-indicator');
+
+        // --- 유틸리티 ---
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        function showStart() {
+            headerEl.classList.add('hidden');
+            history = [];
+            contentEl.innerHTML = `
+                <div class="flex-grow flex flex-col items-center justify-center text-center fade-in py-10">
+                    <span class="text-6xl mb-6">🎓</span>
+                    <h1 class="text-2xl font-bold text-gray-800 mb-4 leading-tight">내 안에 숨어있는<br>교육철학자는 누구?</h1>
+                    <p class="text-gray-600 mb-8 px-4">4개의 질문에 답하면 나의 교육관과 가장 비슷한 교육철학자를 알려드립니다.</p>
+                    <button onclick="startTest()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg transition transform hover:scale-105">
+                        테스트 시작하기
+                    </button>
+                </div>
+            `;
+        }
+
+        function startTest() {
+            currentStep = 0;
+            Object.keys(scores).forEach(k => scores[k] = 0);
+            showQuestion();
+        }
+
+        function showQuestion() {
+            headerEl.classList.remove('hidden');
+            stepIndicatorEl.innerText = `${currentStep + 1} / ${questions.length}`;
+            
+            if (currentStep > 0) prevBtnEl.classList.remove('hidden');
+            else prevBtnEl.classList.add('hidden');
+
+            const q = questions[currentStep];
+            currentOptions = shuffle([...q.options]);
+            currentSelection = { rank1: null, rank2: null, rank3: null };
+
+            renderQuestionContent();
+        }
+
+        function renderQuestionContent() {
+            const q = questions[currentStep];
+            const progress = ((currentStep) / questions.length) * 100;
+            const isComplete = currentSelection.rank1 && currentSelection.rank2 && currentSelection.rank3;
+
+            contentEl.innerHTML = `
+                <div class="fade-in">
+                    <div class="w-full bg-gray-100 h-2 rounded-full mb-6">
+                        <div class="bg-blue-600 h-2 rounded-full transition-all duration-500" style="width: ${progress}%"></div>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-800 mb-6">Q. ${q.q}</h2>
+                    <p class="text-xs text-gray-500 mb-4">공감되는 문장을 순서대로 3개 선택하세요 (1·2·3순위)</p>
+                    
+                    <div class="space-y-3 mb-8">
+                        ${currentOptions.map((opt) => {
+                            let rank = null;
+                            if (currentSelection.rank1 === opt.pid) rank = 1;
+                            else if (currentSelection.rank2 === opt.pid) rank = 2;
+                            else if (currentSelection.rank3 === opt.pid) rank = 3;
+
+                            return `
+                                <div onclick="handleOptionClick('${opt.pid}')" 
+                                     class="card-choice relative p-4 rounded-xl border border-gray-200 bg-white cursor-pointer hover:border-blue-300 transition-all ${rank ? 'selected-'+rank : ''}">
+                                    ${rank ? `<div class="badge ${rank === 1 ? 'bg-blue-500' : rank === 2 ? 'bg-emerald-500' : 'bg-amber-500'}">${rank}</div>` : ''}
+                                    <p class="text-sm text-gray-700 leading-snug">${opt.text}</p>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <button id="nextBtn" 
+                            ${!isComplete ? 'disabled' : ''} 
+                            onclick="nextStep()" 
+                            class="w-full py-4 rounded-2xl font-bold transition-all ${isComplete ? 'bg-blue-600 text-white shadow-md cursor-pointer' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}">
+                        ${currentStep === questions.length - 1 ? '결과 확인하기' : '다음 질문'}
+                    </button>
+                </div>
+            `;
+        }
+
+        window.handleOptionClick = (pid) => {
+            if (currentSelection.rank1 === pid) {
+                currentSelection.rank1 = currentSelection.rank2;
+                currentSelection.rank2 = currentSelection.rank3;
+                currentSelection.rank3 = null;
+            } else if (currentSelection.rank2 === pid) {
+                currentSelection.rank2 = currentSelection.rank3;
+                currentSelection.rank3 = null;
+            } else if (currentSelection.rank3 === pid) {
+                currentSelection.rank3 = null;
+            } else {
+                if (!currentSelection.rank1) currentSelection.rank1 = pid;
+                else if (!currentSelection.rank2) currentSelection.rank2 = pid;
+                else if (!currentSelection.rank3) currentSelection.rank3 = pid;
+            }
+            renderQuestionContent();
+        };
+
+        window.prevStep = () => {
+            if (currentStep <= 0) return;
+            const lastSelection = history.pop();
+            scores[lastSelection.rank1] -= 3;
+            scores[lastSelection.rank2] -= 2;
+            scores[lastSelection.rank3] -= 2;
+            
+            currentStep--;
+            showQuestion();
+        };
+
+        window.nextStep = () => {
+            if (!(currentSelection.rank1 && currentSelection.rank2 && currentSelection.rank3)) return;
+            history.push({...currentSelection});
+            scores[currentSelection.rank1] += 3;
+            scores[currentSelection.rank2] += 2;
+            scores[currentSelection.rank3] += 2;
+            
+            currentStep++;
+            if (currentStep < questions.length) {
+                showQuestion();
+            } else {
+                showLoading();
+                setTimeout(() => {
+                    calculateFinalResult();
+                }, 2000);
+            }
+        };
+
+        function showLoading(customText = "내 마음 속 교육철학자를 찾고 있습니다") {
+            headerEl.classList.add('hidden');
+            contentEl.innerHTML = `
+                <div class="flex-grow flex flex-col items-center justify-center text-center fade-in py-10">
+                    <div class="loader mb-8"></div>
+                    <h2 class="text-xl font-bold text-gray-800 mb-2">분석 중...</h2>
+                    <p class="text-gray-500 animate-pulse italic">"${customText}"</p>
+                </div>
+            `;
+        }
+
+        function calculateFinalResult() {
+            const maxScore = Math.max(...Object.values(scores));
+            const winners = Object.keys(scores).filter(id => scores[id] === maxScore);
+
+            if (winners.length === 1) {
+                showResult(winners[0]);
+            } else {
+                showTieBreaker(winners);
+            }
+        }
+
+        function showTieBreaker(winners) {
+            headerEl.classList.add('hidden');
+            contentEl.innerHTML = `
+                <div class="fade-in py-6 text-center">
+                    <div class="text-4xl mb-4">✨</div>
+                    <h2 class="text-xl font-bold text-gray-800 mb-2">거의 다 왔어요!</h2>
+                    <p class="text-gray-600 mb-8">여러 철학자의 생각이 비슷하게 나타났네요.<br>가장 마음을 울리는 설명을 하나만 골라주세요.</p>
+                    <div class="space-y-4 text-left">
+                        ${shuffle(winners).map(wid => `
+                            <div onclick="showTieBreakerResult('${wid}')" class="p-6 rounded-2xl border-2 border-gray-100 hover:border-blue-400 bg-white hover:bg-blue-50 cursor-pointer transition-all shadow-sm">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <span class="text-3xl">${philosophers[wid].icon}</span>
+                                    <span class="text-sm font-bold text-blue-800">이런 교육은 어떠신가요?</span>
+                                </div>
+                                <ul class="text-sm text-gray-600 space-y-3 leading-relaxed">
+                                    ${philosophers[wid].traits.map(t => `<li class="flex items-start"><span class="mr-2 opacity-50">•</span><span>${t}</span></li>`).join('')}
+                                </ul>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 동점자 선택 후 로딩을 거쳐 결과를 보여주는 함수
+        window.showTieBreakerResult = (pid) => {
+            showLoading("당신을 위한 최종 교육 지침을 정리 중입니다");
+            setTimeout(() => {
+                showResult(pid);
+            }, 2000);
+        };
+
+        function showResult(pid) {
+            headerEl.classList.add('hidden');
+            const p = philosophers[pid];
+            const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+
+            const rankedList = [];
+            let currentRank = 1;
+            for (let i = 0; i < sorted.length; i++) {
+                if (i > 0 && sorted[i][1] < sorted[i-1][1]) {
+                    currentRank = i + 1;
+                }
+                rankedList.push({ pid: sorted[i][0], score: sorted[i][1], rank: currentRank });
+            }
+
+            window.scrollTo(0, 0);
+            
+            contentEl.innerHTML = `
+                <div class="fade-in pb-10">
+                    <div class="text-center mb-8">
+                        <p class="text-blue-600 font-bold mb-2">테스트 결과</p>
+                        <h1 class="text-2xl font-extrabold text-gray-900 mb-4">${p.title}</h1>
+                        <div class="text-7xl mb-6">${p.icon}</div>
+                        <div class="bg-blue-50 p-4 rounded-2xl">
+                            <p class="text-blue-800 font-medium italic">"${p.intro}"</p>
+                        </div>
+                    </div>
+                    <div class="space-y-8">
+                        <section>
+                            <h3 class="flex items-center text-lg font-bold text-gray-800 mb-3"><span class="mr-2">🌟</span> 한 줄 요약</h3>
+                            <p class="bg-gray-50 p-4 rounded-xl text-gray-700 leading-relaxed border-l-4 border-blue-500">${p.summary}</p>
+                        </section>
+                        <section>
+                            <h3 class="flex items-center text-lg font-bold text-gray-800 mb-3"><span class="mr-2">🔍</span> 당신은 이런 사람!</h3>
+                            <ul class="space-y-2">
+                                ${p.traits.map(t => `<li class="flex items-start text-gray-600 text-sm"><span class="text-blue-500 mr-2 mt-1">✔</span> ${t}</li>`).join('')}
+                            </ul>
+                        </section>
+                        <section>
+                            <h3 class="flex items-center text-lg font-bold text-gray-800 mb-3"><span class="mr-2">🏛</span> ${p.name}의 교육관</h3>
+                            <div class="space-y-4">
+                                ${p.theory.map((th, i) => `
+                                    <div class="bg-white border border-gray-100 shadow-sm p-4 rounded-xl">
+                                        <p class="text-sm text-gray-600">${th.split(':')[1] || ''}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </section>
+                        <section class="bg-gradient-to-br from-blue-600 to-blue-700 p-6 rounded-2xl text-white shadow-lg">
+                            <h3 class="text-lg font-bold mb-3 flex items-center"><span class="mr-2">💬</span> ${p.name}의 메시지</h3>
+                            <p class="text-sm leading-relaxed opacity-90 italic">"${p.message}"</p>
+                        </section>
+                        <section class="pt-6 border-t border-gray-100">
+                            <h3 class="text-md font-bold text-gray-800 mb-4">내 안의 또 다른 철학자들</h3>
+                            <div class="grid grid-cols-3 gap-2">
+                                ${rankedList.filter(item => item.pid !== pid).map((item) => `
+                                    <div onclick="showTieBreakerResult('${item.pid}')" class="bg-gray-50 hover:bg-gray-100 p-3 rounded-xl text-center cursor-pointer transition-all">
+                                        <div class="text-xl mb-1">${philosophers[item.pid].icon}</div>
+                                        <p class="text-xs font-bold text-gray-700">${philosophers[item.pid].name}</p>
+                                        <p class="text-[10px] text-gray-400">${item.rank}순위</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </section>
+                        <button onclick="showStart()" class="w-full bg-gray-900 text-white font-bold py-4 rounded-2xl mt-4 shadow-lg hover:bg-black transition-colors">테스트 다시 하기</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.onload = showStart;
+    </script>
+</body>
+</html>
